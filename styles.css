@@ -1,0 +1,273 @@
+:root{
+  --paper:#f3f5f7;
+  --ink:#09090a;
+  --edge:rgba(9,9,10,.18);
+  --glass:rgba(243,245,247,.80);
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+html,body{width:100%;min-height:100%;margin:0}
+html{background:#d9dee5}
+body{overflow:hidden;background:#d9dee5;color:var(--ink);font-family:"IBM Plex Mono","SFMono-Regular",Menlo,Consolas,monospace;text-transform:uppercase}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.page-plane{position:fixed;inset:0;overflow:hidden;background:var(--paper);transform-origin:50% 0%;animation:none}
+.noise{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.022;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.26'/%3E%3C/svg%3E")}
+.site-header{position:fixed;inset:0 0 auto 0;z-index:60;display:flex;justify-content:flex-end;padding:calc(18px + env(safe-area-inset-top,0px)) calc(22px + env(safe-area-inset-right,0px)) 18px calc(22px + env(safe-area-inset-left,0px));pointer-events:none}
+.pill-nav,.desktop-links{display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}
+.pill-nav a,.pill-nav button,.mobile-drawer a{min-height:40px;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--edge);border-radius:999px;background:var(--glass);color:var(--ink);backdrop-filter:blur(18px) saturate(1.08);-webkit-backdrop-filter:blur(18px) saturate(1.08);box-shadow:0 12px 28px rgba(11,11,12,.055);font-size:11px;font-weight:500;letter-spacing:.075em;line-height:1;white-space:nowrap;transition:transform .35s var(--ease),background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),box-shadow .35s var(--ease)}
+.pill-nav a:hover,.pill-nav a:focus-visible,.pill-nav button:hover,.pill-nav button:focus-visible,.mobile-drawer a:hover,.mobile-drawer a:focus-visible{background:#fff;border-color:rgba(255,255,255,.95);transform:translateY(-2px);box-shadow:0 15px 35px rgba(11,11,12,.10);outline:none}
+.music-led{width:6px;height:6px;border:1px solid currentColor;border-radius:50%;background:transparent}
+.music-pill.is-active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.music-pill.is-active .music-led{background:currentColor;box-shadow:0 0 9px currentColor}
+.mobile-only{display:none!important}
+.mobile-drawer{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));z-index:70;display:grid;gap:7px;width:min(230px,calc(100vw - 24px));padding:9px;border:1px solid rgba(11,11,12,.13);border-radius:22px;background:rgba(243,245,247,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 22px 50px rgba(11,11,12,.12);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-7px) scale(.985);transition:opacity .18s ease,transform .26s var(--ease),visibility .18s step-end}
+.mobile-drawer.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1);transition:opacity .18s ease,transform .26s var(--ease),visibility 0s}
+.mobile-drawer a{min-height:44px;justify-content:flex-start}
+.hero{position:relative;width:100vw;height:100svh;min-height:0;overflow:hidden;isolation:isolate}
+#hero-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none}
+#hero-video{position:fixed;width:1px;height:1px;left:-10px;top:-10px;opacity:.001;pointer-events:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.elite-cursor{position:fixed;left:0;top:0;z-index:9999;width:0;height:0;pointer-events:none;opacity:0;mix-blend-mode:difference;transition:opacity .12s linear}
+.elite-cursor.is-visible{opacity:1}
+.elite-cursor-ring,.elite-cursor-dot{position:absolute;left:0;top:0;border-radius:50%;will-change:transform}
+.elite-cursor-ring{width:34px;height:34px;margin:-17px 0 0 -17px;border:1px solid rgba(255,255,255,.96);box-shadow:0 0 0 1px rgba(0,0,0,.08);transition:width .18s var(--ease),height .18s var(--ease),margin .18s var(--ease),background .18s ease}
+.elite-cursor-dot{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.4)}
+.elite-cursor.is-hover .elite-cursor-ring{width:54px;height:54px;margin:-27px 0 0 -27px;background:rgba(255,255,255,.10)}
+.elite-cursor.is-down .elite-cursor-ring{width:27px;height:27px;margin:-13.5px 0 0 -13.5px}
+:focus-visible{outline:2px solid #0b0b0c;outline-offset:3px}
+@keyframes arrive{0%{opacity:.08;transform:translate3d(0,-7vh,0) scale(.988)}70%{opacity:1;transform:translate3d(0,.5vh,0) scale(1.001)}100%{opacity:1;transform:none}}
+@media(pointer:fine) and (hover:hover){body,body a,body button,#hero-canvas{cursor:none}}
+@media(max-width:850px),(max-height:700px) and (hover:none) and (pointer:coarse){.site-header{padding:calc(10px + env(safe-area-inset-top,0px)) calc(10px + env(safe-area-inset-right,0px)) 10px calc(10px + env(safe-area-inset-left,0px))}.desktop-links{display:none}.mobile-only{display:inline-flex!important}.pill-nav{gap:6px}.pill-nav button{min-height:44px;padding:0 14px}.elite-cursor{display:none}}
+@media(max-width:420px){.site-header{padding-left:8px;padding-right:8px}.pill-nav button{padding-inline:13px}.mobile-drawer{right:8px;width:calc(100vw - 16px)}}
+@media(hover:none) and (pointer:coarse){.pill-nav a:hover,.pill-nav button:hover,.mobile-drawer a:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.page-plane{animation:none}.elite-cursor{display:none}}
+@media(forced-colors:active){.elite-cursor{display:none!important}body,body a,body button,#hero-canvas{cursor:auto!important}}
+
+/* 2026-10-18: single Menu dropdown; the full-sized wordmark remains unobstructed. */
+.site-header{align-items:flex-start;padding:calc(22px + env(safe-area-inset-top,0px)) calc(26px + env(safe-area-inset-right,0px)) 18px}
+.pill-nav{gap:8px}
+.pill-nav button{min-height:44px;padding:0 20px;background:rgba(245,247,249,.93);border:1px solid rgba(9,9,10,.22);font-size:11px;font-weight:650}
+.menu-pill{gap:16px;min-width:111px;position:relative}
+.menu-icon{width:18px;display:flex;flex-direction:column;gap:5px;transition:transform .45s var(--ease)}
+.menu-icon i{height:1.5px;background:currentColor;width:100%;display:block;transition:transform .4s var(--ease)}
+.menu-pill[aria-expanded="true"] .menu-icon i:first-child{transform:translateY(3.3px) rotate(45deg)}
+.menu-pill[aria-expanded="true"] .menu-icon i:last-child{transform:translateY(-3.3px) rotate(-45deg)}
+.mobile-drawer{
+  position:fixed;top:calc(78px + env(safe-area-inset-top,0px));right:calc(26px + env(safe-area-inset-right,0px));
+  width:min(420px,calc(100vw - 30px));max-height:calc(100dvh - 106px);overflow-y:auto;
+  gap:0;padding:15px 20px 18px;border:1px solid rgba(9,9,10,.24);border-radius:3px;
+  background:rgba(249,250,251,.98);box-shadow:0 27px 75px rgba(9,9,10,.15);
+  transform:translateY(-12px);transform-origin:100% 0;
+}
+.mobile-drawer a{
+  min-height:70px;justify-content:space-between;padding:12px 5px;
+  border:0;border-bottom:1px solid rgba(9,9,10,.17);border-radius:0;
+  background:transparent;box-shadow:none;backdrop-filter:none;
+  text-transform:none;letter-spacing:-.035em;font-family:"Arial Black","Helvetica Neue",Arial,sans-serif;
+  font-weight:850;font-size:clamp(23px,2.8vw,33px);
+  transition:transform .5s var(--ease),color .3s ease,opacity .7s,background .3s;
+}
+.mobile-drawer a:last-child{border-bottom:0}
+.mobile-drawer a span{font-family:Arial,sans-serif;font-size:18px;font-weight:400;letter-spacing:0}
+.mobile-drawer.is-open a{animation:menu-word-enter .85s var(--ease) both}
+.mobile-drawer.is-open a:nth-child(1){animation-delay:.04s}
+.mobile-drawer.is-open a:nth-child(2){animation-delay:.10s}
+.mobile-drawer.is-open a:nth-child(3){animation-delay:.16s}
+.mobile-drawer.is-open a:nth-child(4){animation-delay:.22s}
+.mobile-drawer.is-open a:nth-child(5){animation-delay:.28s}
+@keyframes menu-word-enter{from{opacity:0;translate:-45px 0}to{opacity:1;translate:0 0}}
+@media (hover:hover) and (pointer:fine){.mobile-drawer a:hover{background:transparent;transform:translateX(9px);color:#45464b;box-shadow:none;border-color:rgba(9,9,10,.17)}}
+@media(max-width:700px){
+.site-header{padding:calc(13px + env(safe-area-inset-top,0px)) calc(13px + env(safe-area-inset-right,0px)) 10px}
+.mobile-drawer{top:calc(68px + env(safe-area-inset-top,0px));right:12px;max-height:calc(100dvh - 88px);width:min(420px,calc(100vw - 24px))}
+.mobile-drawer a{min-height:64px;font-size:clamp(25px,7vw,35px)}
+}
+@media(prefers-reduced-motion:reduce){.mobile-drawer.is-open a{animation:none!important}}
+
+/* Editorial dropdown: strong grotesk typography, no decorative arrow glyphs. */
+.mobile-drawer a{
+  font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;
+  font-weight:750;
+  font-size:clamp(25px,3vw,37px);
+  letter-spacing:-.047em;
+  text-transform:none;
+  padding-inline:8px;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+}
+.mobile-drawer a span{display:none}
+.mobile-drawer a:hover,.mobile-drawer a:focus-visible{color:#070709}
+@media(max-width:700px){.mobile-drawer a{font-size:clamp(26px,7vw,37px)}}
+
+/* Noth.in-inspired art direction: monumental editorial type and nearly
+   invisible navigation.  The pointer-reactive color stays in the wordmark. */
+body{font-family:"IBM Plex Mono","SFMono-Regular",Menlo,Consolas,monospace}
+.mobile-drawer a{
+  font-family:"Archivo Black","Arial Black","Helvetica Neue",Arial,sans-serif;
+  font-weight:400;
+  letter-spacing:-.057em;
+}
+.pill-nav button{font-family:"IBM Plex Mono","SFMono-Regular",Menlo,monospace;
+  letter-spacing:.045em;font-weight:500}
+@media(prefers-reduced-motion:reduce){
+ .mobile-drawer.is-open a{animation:none!important}
+ .page-plane{animation:none!important}
+}
+
+/* Progressive WebGL2 layer sits above the preserved Canvas 2D fallback. */
+.hero-gpu-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;display:block}
+.gpu-source-video{position:absolute;left:-2px;top:-2px;width:1px;height:1px;opacity:.001;pointer-events:none}
+
+/* Cross-origin-safe path: original browser-decoded video stays inside glyphs. */
+/* The parent holds the pixel-perfect word mask, the native video moves
+   inside it as a perspective camera plane. The mask never moves. */
+.hero-film-window {
+  position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  isolation:isolate;
+}
+#hero-video.gpu-native-film{
+  position:absolute;left:0;top:50%;width:100%;height:100%;
+  opacity:1;display:block;object-fit:cover;object-position:center;
+  max-width:none;max-height:none;
+  transform-origin:50% 50%;will-change:transform,filter;
+  z-index:1;pointer-events:none;
+}
+
+/* Mobile letter block is much shorter than the full screen. Avoid magnifying
+   4:3 footage to 844px tall when only the center lettering needs imagery. */
+@media (max-width:700px){
+  #hero-video.gpu-native-film{height:clamp(340px,58svh,540px);object-fit:cover;}
+}
+
+/* Optional approved scene assets live inside the stationary glyph mask. */
+.hero-film-window .scene-depth-layer{
+  position:absolute;inset:-6%;width:112%;height:112%;z-index:3;
+  object-fit:cover;pointer-events:none;opacity:0;
+  max-width:none;max-height:none;will-change:opacity,transform;
+}
+
+/* Real WebGL2 polygon worlds are rendered into the pre-existing fixed
+   wordmark aperture, never into the nav or editorial page. */
+.hero-film-window .hero-object-canvas{
+ position:absolute;inset:0;width:100%;height:100%;display:block;
+ z-index:5;pointer-events:none;contain:strict;
+}
+
+/* 2026-10-29: precise native pointer, compact editorial menu. */
+.elite-cursor{display:none!important}
+body,body a,body button,#hero-canvas{cursor:default!important}
+.pill-nav button,.pill-nav a,.mobile-drawer a{cursor:pointer!important}
+.mobile-drawer{
+  top:calc(75px + env(safe-area-inset-top,0px));
+  right:calc(26px + env(safe-area-inset-right,0px));
+  width:min(308px,calc(100vw - 32px));
+  max-height:calc(100dvh - 94px);
+  padding:8px 16px;
+  gap:0;
+  overflow-y:auto;
+  border:1px solid rgba(9,9,10,.15);
+  border-radius:12px;
+  background:rgba(248,249,250,.97);
+  box-shadow:0 15px 45px rgba(9,9,10,.085);
+  transform:translateY(-8px);
+  transition:opacity .3s ease,transform .38s var(--ease),visibility .3s step-end;
+}
+.mobile-drawer.is-open{
+  transform:translateY(0);
+  transition:opacity .3s ease,transform .38s var(--ease),visibility 0s;
+}
+.mobile-drawer a{
+  min-height:49px;
+  padding:10px 3px;
+  border-bottom:1px solid rgba(9,9,10,.11);
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:clamp(16px,1.4vw,19px);
+  font-weight:500;
+  letter-spacing:-.025em;
+  line-height:1.25;
+  text-rendering:optimizeLegibility;
+  text-transform:none;
+  transform:none;
+  animation:none!important;
+  transition:transform .42s var(--ease),color .3s ease,background .3s ease;
+}
+.mobile-drawer a:hover,.mobile-drawer a:focus-visible{
+  transform:translateX(3px);
+  color:#34363a;
+  background:transparent;
+  box-shadow:none;
+  outline-offset:-2px;
+}
+@media(max-width:700px){
+  .mobile-drawer{
+    top:calc(64px + env(safe-area-inset-top,0px));
+    right:12px;
+    width:min(288px,calc(100vw - 24px));
+    padding:8px 14px;
+    max-height:calc(100dvh - 80px);
+  }
+  .mobile-drawer a{
+    min-height:48px;
+    font-size:17px;
+    font-weight:500;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .mobile-drawer,.mobile-drawer.is-open,.mobile-drawer a{transition:none!important;animation:none!important}
+}
+
+/* Deliberate high-end motion: tactile but quiet navigation, no gimmicks. */
+.menu-pill {
+  transition:transform .46s cubic-bezier(.2,.8,.2,1),
+    border-color .35s ease, box-shadow .4s ease, background .4s ease;
+}
+@media(hover:hover) and (pointer:fine) {
+  .menu-pill:hover,
+  .menu-pill[aria-expanded="true"] {
+    background:rgba(255,255,255,.96);
+    border-color:rgba(9,9,10,.34);
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(9,9,10,.075);
+  }
+}
+.mobile-drawer {
+  background:rgba(250,250,251,.975);
+  -webkit-font-smoothing:antialiased;
+  border-color:rgba(18,18,20,.14);
+  box-shadow:0 20px 55px rgba(9,9,10,.11);
+  transition:opacity .31s ease,transform .45s cubic-bezier(.19,1,.22,1),visibility .31s step-end;
+}
+.mobile-drawer.is-open{
+  transition:opacity .31s ease,transform .45s cubic-bezier(.19,1,.22,1),visibility 0s;
+}
+.mobile-drawer a {
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:clamp(16px,1.45vw,19px);
+  font-weight:500;
+  letter-spacing:-.022em;
+}
+@media(max-width:700px) {
+  .mobile-drawer a {font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){
+  .menu-pill,.mobile-drawer,.mobile-drawer.is-open,.mobile-drawer a{
+    animation:none!important;transition:none!important;
+  }
+}
+
+
+/* 2026-11-09: the wordmark itself is the only entrance animation.
+   GPU layers share one transform so the world never escapes the glyph aperture. */
+.hero-film-window,.hero-gpu-layer{will-change:transform}
+.hero-film-window{contain:paint;overflow:hidden}
+
+
+/* Production mobile GPU cleanup: the full-screen multiply-noise layer is
+   visually negligible at phone size but forces an extra compositing pass. */
+@media (max-width:700px){
+  .noise{display:none!important}
+}
